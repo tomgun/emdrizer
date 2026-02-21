@@ -1,0 +1,46 @@
+.instructions {
+  margin-bottom: 1rem;
+}
+
+.instructions-toggle {
+  padding: 0.4rem 0.75rem;
+  font-size: 0.9rem;
+  font-weight: 500;
+  color: inherit;
+  background: var(--instructions-btn-bg, rgba(255, 255, 255, 0.12));
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  border-radius: 6px;
+  cursor: pointer;
+}
+
+.app[data-theme='light'] .instructions-toggle {
+  --instructions-btn-bg: rgba(0, 0, 0, 0.06);
+  border-color: rgba(0, 0, 0, 0.15);
+}
+
+.instructions-toggle:hover {
+  opacity: 0.9;
+}
+
+.instructions-content {
+  margin-top: 0.75rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--instructions-bg, rgba(0, 0, 0, 0.12));
+}
+
+.app[data-theme='light'] .instructions-content {
+  --instructions-bg: rgba(0, 0, 0, 0.05);
+}
+
+.instructions-position,
+.instructions-common {
+  margin: 0 0 0.75rem;
+  font-size: 0.9rem;
+  line-height: 1.5;
+}
+
+.instructions-common {
+  margin-bottom: 0;
+  opacity: 0.95;
+}

@@ -1,0 +1,108 @@
+.app {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+  padding: 1rem;
+  box-sizing: border-box;
+}
+
+.app[data-theme='dark'] {
+  background: #1a1a1a;
+  color: #e0e0e0;
+}
+
+.app[data-theme='light'] {
+  background: #f5f5f5;
+  color: #222;
+}
+
+.header {
+  text-align: center;
+  margin-bottom: 1.5rem;
+}
+
+.header h1 {
+  margin: 0;
+  font-size: 1.5rem;
+  font-weight: 600;
+}
+
+.tagline {
+  margin: 0.25rem 0 0;
+  font-size: 0.9rem;
+  opacity: 0.85;
+}
+
+.controls {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 1.5rem;
+  align-items: flex-start;
+  margin-bottom: 1.5rem;
+  padding: 1rem;
+  border-radius: 8px;
+  background: var(--controls-bg, rgba(0, 0, 0, 0.15));
+}
+
+.app[data-theme='light'] .controls {
+  --controls-bg: rgba(0, 0, 0, 0.06);
+}
+
+.control-group {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35rem;
+}
+
+.control-group label {
+  font-size: 0.85rem;
+  font-weight: 500;
+}
+
+.control-group select {
+  padding: 0.4rem 0.6rem;
+  font-size: 1rem;
+  border-radius: 6px;
+  border: 1px solid rgba(255, 255, 255, 0.2);
+  background: rgba(255, 255, 255, 0.1);
+  color: inherit;
+  min-width: 12rem;
+}
+
+.app[data-theme='light'] .control-group select {
+  border-color: rgba(0, 0, 0, 0.2);
+  background: #fff;
+  color: #222;
+}
+
+.preset-desc {
+  margin: 0;
+  font-size: 0.8rem;
+  opacity: 0.85;
+  max-width: 280px;
+}
+
+.control-group input[type='checkbox'] {
+  margin-right: 0.5rem;
+}
+
+.target-area {
+  flex: 1;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  min-height: 160px;
+  margin: 1rem 0;
+}
+
+.footer {
+  text-align: center;
+  font-size: 0.85rem;
+  opacity: 0.8;
+  margin-top: auto;
+  padding-top: 1rem;
+}
+
+.footer p {
+  margin: 0;
+}
