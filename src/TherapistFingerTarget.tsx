@@ -6,6 +6,7 @@ interface TherapistFingerTargetProps {
   dark?: boolean
   /** Use the “pointing at you” hand image (silly / AI darndest things mode). */
   sillyHand?: boolean
+  fullscreen?: boolean
   className?: string
 }
 
@@ -14,14 +15,15 @@ const CALM_PERSON_BG =
   'https://images.pexels.com/photos/5793952/pexels-photo-5793952.jpeg?auto=compress&cs=tinysrgb&w=800'
 
 /** Hand with finger up (hypnotist-style) – Pexels 3779434, Olly. */
-const HAND_IMAGE = '/images/therapist-hand.jpg'
+const BASE = import.meta.env.BASE_URL
+const HAND_IMAGE = `${BASE}images/therapist-hand.jpg`
 /** Hand pointing at you – “fun” variant (Pexels 1259327, Rodolpho Zanardo). */
-const HAND_IMAGE_POINTING = '/images/therapist-hand-pointing.jpg'
+const HAND_IMAGE_POINTING = `${BASE}images/therapist-hand-pointing.jpg`
 
 /**
  * Therapist view: calm blurred person in background; real hand image (finger up) as moving target.
  */
-export function TherapistFingerTarget({ hz, sillyHand = false, className = '' }: TherapistFingerTargetProps) {
+export function TherapistFingerTarget({ hz, sillyHand = false, fullscreen = false, className = '' }: TherapistFingerTargetProps) {
   const handSrc = sillyHand ? HAND_IMAGE_POINTING : HAND_IMAGE
   const setPosition = useCallback((el: HTMLElement | null, leftPx: number) => {
     if (el) el.style.transform = `translateX(${leftPx}px)`
@@ -36,7 +38,7 @@ export function TherapistFingerTarget({ hz, sillyHand = false, className = '' }:
       style={{
         position: 'relative',
         width: '100%',
-        height: '200px',
+        height: fullscreen ? '100%' : '200px',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',

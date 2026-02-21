@@ -1,4 +1,4 @@
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { KittTarget } from './KittTarget'
 import { KittCarTarget } from './KittCarTarget'
 import { TherapistFingerTarget } from './TherapistFingerTarget'
@@ -13,9 +13,21 @@ function App() {
   const [dark, setDark] = useState(true)
   const [view, setView] = useState<ViewType>('sweeping-dot')
   const [sillyHand, setSillyHand] = useState(false)
+  const [isFullscreen, setIsFullscreen] = useState(false)
+  const stageRef = useRef<HTMLDivElement>(null)
 
   const preset = SPEED_PRESETS[presetId]
   const hz = preset.hz
+
+  useEffect(() => {
+    const onFullscreenChange = () =>
+      setIsFullscreen(!!document.fullscreenElement && document.fullscreenElement === stageRef.current)
+    document.addEventListener('fullscreenchange', onFullscreenChange)
+    return () => document.removeEventListener('fullscreenchange', onFullscreenChange)
+  }, [])
+
+  const goFullscreen = () => stageRef.current?.requestFullscreen()
+  const exitFullscreen = () => document.exitFullscreen()
 
   return (
     <div className="app" data-theme={dark ? 'dark' : 'light'}>
@@ -85,11 +97,33 @@ function App() {
       </section>
 
       <section className="target-area" aria-label="Moving eye target">
-        {view === 'sweeping-dot' && <KittTarget hz={hz} dark={dark} />}
-        {view === 'kitt' && <KittCarTarget hz={hz} dark={dark} />}
-        {view === 'finger' && (
-          <TherapistFingerTarget hz={hz} dark={dark} sillyHand={sillyHand} />
-        )}
+        <div ref={stageRef} className="stage-wrapper">
+          <div className="stage-inner">
+            {view === 'sweeping-dot' && <KittTarget hz={hz} dark={dark} fullscreen={isFullscreen} />}
+            {view === 'kitt' && <KittCarTarget hz={hz} dark={dark} fullscreen={isFullscreen} />}
+            {view === 'finger' && (
+              <TherapistFingerTarget hz={hz} dark={dark} sillyHand={sillyHand} fullscreen={isFullscreen} />
+            )}
+          </div>
+          {isFullscreen && (
+            <button
+              type="button"
+              className="exit-fullscreen"
+              onClick={exitFullscreen}
+              aria-label="Exit full screen"
+            >
+              Exit full screen
+            </button>
+          )}
+        </div>
+        <button
+          type="button"
+          className="fullscreen-btn"
+          onClick={goFullscreen}
+          aria-label="Full screen: stage only"
+        >
+          Full screen
+        </button>
       </section>
 
       <footer className="footer">

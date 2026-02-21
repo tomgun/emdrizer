@@ -5,6 +5,7 @@ interface KittTargetProps {
   hz: number
   /** Use dark theme (light target on dark bg) */
   dark?: boolean
+  fullscreen?: boolean
   className?: string
 }
 
@@ -12,7 +13,7 @@ interface KittTargetProps {
  * KITT-style moving eye target: one bright element sweeping left–right smoothly.
  * Uses time-based position so speed is exact and frame-rate independent.
  */
-export function KittTarget({ hz, dark = true, className = '' }: KittTargetProps) {
+export function KittTarget({ hz, dark = true, fullscreen = false, className = '' }: KittTargetProps) {
   const containerRef = useRef<HTMLDivElement>(null)
   const dotRef = useRef<HTMLDivElement>(null)
   const startTimeRef = useRef<number | null>(null)
@@ -55,7 +56,7 @@ export function KittTarget({ hz, dark = true, className = '' }: KittTargetProps)
       style={{
         position: 'relative',
         width: '100%',
-        height: '120px',
+        height: fullscreen ? '100%' : '120px',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',

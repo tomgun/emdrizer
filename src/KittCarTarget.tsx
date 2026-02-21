@@ -8,6 +8,7 @@ const KITT_BG_IMAGE =
 interface KittCarTargetProps {
   hz: number
   dark?: boolean
+  fullscreen?: boolean
   className?: string
 }
 
@@ -15,7 +16,7 @@ interface KittCarTargetProps {
  * Authentic KITT (Knight Rider) scanner: red light bar sweeping across KITT + Hasselhoff background.
  * Background: KITT at David Hasselhoff Museum (CC BY-SA 4.0). Red scanner = Anamorphic Equalizer.
  */
-export function KittCarTarget({ hz, className = '' }: KittCarTargetProps) {
+export function KittCarTarget({ hz, fullscreen = false, className = '' }: KittCarTargetProps) {
   const setPosition = useCallback((el: HTMLElement | null, leftPx: number) => {
     if (el) el.style.transform = `translateX(${leftPx}px)`
   }, [])
@@ -29,7 +30,7 @@ export function KittCarTarget({ hz, className = '' }: KittCarTargetProps) {
       style={{
         position: 'relative',
         width: '100%',
-        height: '180px',
+        height: fullscreen ? '100%' : '180px',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
