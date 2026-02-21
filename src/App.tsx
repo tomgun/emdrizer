@@ -3,6 +3,8 @@ import { KittTarget } from './KittTarget'
 import { KittCarTarget } from './KittCarTarget'
 import { TherapistFingerTarget } from './TherapistFingerTarget'
 import { Instructions } from './Instructions'
+import { SessionFlow } from './SessionFlow'
+import { useSessionState } from './useSessionState'
 import { SPEED_PRESETS, type PresetId } from './speedPresets'
 import './App.css'
 
@@ -15,6 +17,7 @@ function App() {
   const [sillyHand, setSillyHand] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const stageRef = useRef<HTMLDivElement>(null)
+  const [sessionState, sessionActions] = useSessionState()
 
   const preset = SPEED_PRESETS[presetId]
   const hz = preset.hz
@@ -29,6 +32,27 @@ function App() {
   const goFullscreen = () => stageRef.current?.requestFullscreen()
   const exitFullscreen = () => document.exitFullscreen()
 
+  if (sessionState) {
+    return (
+      <div className="app app-session" data-theme={dark ? 'dark' : 'light'}>
+        <header className="header">
+          <h1>Emdrizer</h1>
+          <p className="tagline">Session</p>
+        </header>
+        <section className="target-area session-area" aria-label="Session">
+          <SessionFlow
+            state={sessionState}
+            actions={sessionActions}
+            view={view}
+            hz={hz}
+            dark={dark}
+            sillyHand={sillyHand}
+          />
+        </section>
+      </div>
+    )
+  }
+
   return (
     <div className="app" data-theme={dark ? 'dark' : 'light'}>
       <header className="header">
@@ -39,6 +63,16 @@ function App() {
       <Instructions />
 
       <section className="controls">
+        <div className="control-group">
+          <button
+            type="button"
+            className="session-start-btn"
+            onClick={() => sessionActions.startSession()}
+            aria-label="Start a structured session with stages and breaks"
+          >
+            Start session
+          </button>
+        </div>
         <div className="control-group">
           <label htmlFor="view">Target view</label>
           <select
