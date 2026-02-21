@@ -1,16 +1,18 @@
 import { useState } from 'react'
 import { KittTarget } from './KittTarget'
+import { KittCarTarget } from './KittCarTarget'
 import { TherapistFingerTarget } from './TherapistFingerTarget'
 import { Instructions } from './Instructions'
 import { SPEED_PRESETS, type PresetId } from './speedPresets'
 import './App.css'
 
-export type ViewType = 'kitt' | 'finger'
+export type ViewType = 'sweeping-dot' | 'kitt' | 'finger'
 
 function App() {
   const [presetId, setPresetId] = useState<PresetId>('standard')
   const [dark, setDark] = useState(true)
-  const [view, setView] = useState<ViewType>('kitt')
+  const [view, setView] = useState<ViewType>('sweeping-dot')
+  const [sillyHand, setSillyHand] = useState(false)
 
   const preset = SPEED_PRESETS[presetId]
   const hz = preset.hz
@@ -32,7 +34,8 @@ function App() {
             value={view}
             onChange={(e) => setView(e.target.value as ViewType)}
           >
-            <option value="kitt">KITT (moving light)</option>
+            <option value="sweeping-dot">Sweeping light</option>
+            <option value="kitt">KITT (Knight Rider)</option>
             <option value="finger">Therapist finger</option>
           </select>
         </div>
@@ -66,12 +69,26 @@ function App() {
             Dark background (light target)
           </label>
         </div>
+
+        {view === 'finger' && (
+          <div className="control-group">
+            <label>
+              <input
+                type="checkbox"
+                checked={sillyHand}
+                onChange={(e) => setSillyHand(e.target.checked)}
+              />
+              Silly hand (pointing at you — AI darndest things)
+            </label>
+          </div>
+        )}
       </section>
 
       <section className="target-area" aria-label="Moving eye target">
-        {view === 'kitt' && <KittTarget hz={hz} dark={dark} />}
+        {view === 'sweeping-dot' && <KittTarget hz={hz} dark={dark} />}
+        {view === 'kitt' && <KittCarTarget hz={hz} dark={dark} />}
         {view === 'finger' && (
-          <TherapistFingerTarget hz={hz} dark={dark} />
+          <TherapistFingerTarget hz={hz} dark={dark} sillyHand={sillyHand} />
         )}
       </section>
 

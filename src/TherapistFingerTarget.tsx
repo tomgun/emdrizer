@@ -1,51 +1,33 @@
-import { useEffect, useRef, useCallback } from 'react'
+import { useCallback } from 'react'
+import { useSweepMotion } from './useSweepMotion'
 
 interface TherapistFingerTargetProps {
   hz: number
   dark?: boolean
+  /** Use the “pointing at you” hand image (silly / AI darndest things mode). */
+  sillyHand?: boolean
   className?: string
 }
 
+/** Calm, single-person background (Yan Krukau, Pexels). Blurred so it’s presence only, not distracting. */
+const CALM_PERSON_BG =
+  'https://images.pexels.com/photos/5793952/pexels-photo-5793952.jpeg?auto=compress&cs=tinysrgb&w=800'
+
+/** Hand with finger up (hypnotist-style) – Pexels 3779434, Olly. */
+const HAND_IMAGE = '/images/therapist-hand.jpg'
+/** Hand pointing at you – “fun” variant (Pexels 1259327, Rodolpho Zanardo). */
+const HAND_IMAGE_POINTING = '/images/therapist-hand-pointing.jpg'
+
 /**
- * Therapist-style finger target: blurred finger-like shape moving left–right.
- * Same motion and speed system as KITT (F-0003).
+ * Therapist view: calm blurred person in background; real hand image (finger up) as moving target.
  */
-export function TherapistFingerTarget({
-  hz,
-  dark = true,
-  className = '',
-}: TherapistFingerTargetProps) {
-  const containerRef = useRef<HTMLDivElement>(null)
-  const fingerRef = useRef<HTMLDivElement>(null)
-  const startTimeRef = useRef<number | null>(null)
-  const rafRef = useRef<number>(0)
+export function TherapistFingerTarget({ hz, sillyHand = false, className = '' }: TherapistFingerTargetProps) {
+  const handSrc = sillyHand ? HAND_IMAGE_POINTING : HAND_IMAGE
+  const setPosition = useCallback((el: HTMLElement | null, leftPx: number) => {
+    if (el) el.style.transform = `translateX(${leftPx}px)`
+  }, [])
 
-  const animate = useCallback(() => {
-    const container = containerRef.current
-    const finger = fingerRef.current
-    if (!container || !finger) return
-
-    const now = performance.now()
-    if (startTimeRef.current === null) startTimeRef.current = now
-    const elapsed = (now - startTimeRef.current) / 1000
-
-    const period = 1 / hz
-    const phase = (elapsed % period) / period
-    const t = phase < 0.5 ? phase * 2 : 2 - phase * 2
-    const rect = container.getBoundingClientRect()
-    const padding = 32
-    const range = rect.width - padding * 2
-    const left = padding + t * range
-
-    finger.style.transform = `translateX(${left}px)`
-    rafRef.current = requestAnimationFrame(animate)
-  }, [hz])
-
-  useEffect(() => {
-    startTimeRef.current = null
-    rafRef.current = requestAnimationFrame(animate)
-    return () => cancelAnimationFrame(rafRef.current)
-  }, [animate])
+  const { containerRef, movingRef } = useSweepMotion(hz, setPosition)
 
   return (
     <div
@@ -54,34 +36,57 @@ export function TherapistFingerTarget({
       style={{
         position: 'relative',
         width: '100%',
-        height: '140px',
+        height: '200px',
         overflow: 'hidden',
         display: 'flex',
         alignItems: 'center',
       }}
       aria-hidden="true"
     >
+      {/* Blurred calm person – visible as a person, not abstract noise */}
       <div
-        ref={fingerRef}
+        style={{
+          position: 'absolute',
+          inset: 0,
+          backgroundImage: `url(${CALM_PERSON_BG})`,
+          backgroundSize: 'cover',
+          backgroundPosition: 'center',
+          filter: 'blur(12px)',
+          transform: 'scale(1.05)',
+        }}
+      />
+      <div
+        style={{
+          position: 'absolute',
+          inset: 0,
+          background: 'linear-gradient(180deg, rgba(0,0,0,0.08) 0%, transparent 50%, rgba(0,0,0,0.06) 100%)',
+        }}
+      />
+      {/* Moving target: real hand, clearly visible (no blur so it reads as a hand) */}
+      <div
+        ref={movingRef}
         className="therapist-finger"
         style={{
           position: 'absolute',
           left: 0,
           top: '50%',
-          marginTop: '-24px',
-          width: '28px',
-          height: '48px',
-          borderRadius: '14px 14px 18px 18px',
-          background: dark
-            ? 'linear-gradient(135deg, #e8e0d5 0%, #c4b8a8 50%, #a89888 100%)'
-            : 'linear-gradient(135deg, #6b5b4f 0%, #4a4038 50%, #3a322c 100%)',
-          boxShadow: dark
-            ? '2px 2px 8px rgba(0,0,0,0.3)'
-            : '2px 2px 8px rgba(0,0,0,0.5)',
-          filter: 'blur(4px)',
+          marginTop: '-70px',
+          width: '140px',
+          height: '140px',
           willChange: 'transform',
         }}
-      />
+      >
+        <img
+          src={handSrc}
+          alt=""
+          style={{
+            width: '100%',
+            height: '100%',
+            objectFit: 'contain',
+            display: 'block',
+          }}
+        />
+      </div>
     </div>
   )
 }
