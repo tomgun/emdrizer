@@ -37,4 +37,6 @@ export interface SessionState {
   targets: SessionTarget[]
   /** When we entered the current stage (for timers). */
   stageStartedAt: number
+  /** View when started from URL (e.g. /session/kitt); otherwise use app view. */
+  viewOverride?: 'sweeping-dot' | 'kitt' | 'finger'
 }

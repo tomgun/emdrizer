@@ -5,6 +5,7 @@ import { TherapistFingerTarget } from './TherapistFingerTarget'
 import { Instructions } from './Instructions'
 import { SessionFlow } from './SessionFlow'
 import { useSessionState } from './useSessionState'
+import { getSessionPath, getViewFromSessionPath, pushSessionUrl, pushMainUrl } from './sessionRoutes'
 import { SPEED_PRESETS, type PresetId } from './speedPresets'
 import './App.css'
 
@@ -17,10 +18,44 @@ function App() {
   const [sillyHand, setSillyHand] = useState(false)
   const [isFullscreen, setIsFullscreen] = useState(false)
   const stageRef = useRef<HTMLDivElement>(null)
+  const sessionContainerRef = useRef<HTMLDivElement>(null)
   const [sessionState, sessionActions] = useSessionState()
+  const prevSessionRef = useRef<typeof sessionState>(null)
 
   const preset = SPEED_PRESETS[presetId]
   const hz = preset.hz
+
+  // Open session from URL on load (/session, /session/kitt, etc.)
+  useEffect(() => {
+    const path = getSessionPath()
+    if (!path) return
+    const viewFromUrl = getViewFromSessionPath(path)
+    setView(viewFromUrl)
+    sessionActions.startSession(undefined, [], viewFromUrl)
+    pushSessionUrl(viewFromUrl)
+  }, [])
+
+  // Sync URL when leaving session (Back to main)
+  useEffect(() => {
+    if (prevSessionRef.current && !sessionState) pushMainUrl()
+    prevSessionRef.current = sessionState
+  }, [sessionState])
+
+  // Browser back/forward
+  useEffect(() => {
+    const onPopState = () => {
+      const path = getSessionPath()
+      if (!path) {
+        sessionActions.endSession()
+        return
+      }
+      const viewFromUrl = getViewFromSessionPath(path)
+      setView(viewFromUrl)
+      sessionActions.startSession(undefined, [], viewFromUrl)
+    }
+    window.addEventListener('popstate', onPopState)
+    return () => window.removeEventListener('popstate', onPopState)
+  }, [sessionActions])
 
   useEffect(() => {
     const onFullscreenChange = () =>
@@ -32,21 +67,28 @@ function App() {
   const goFullscreen = () => stageRef.current?.requestFullscreen()
   const exitFullscreen = () => document.exitFullscreen()
 
+  const handleStartSession = () => {
+    sessionActions.startSession()
+    pushSessionUrl(view)
+  }
+
   if (sessionState) {
+    const sessionView = sessionState.viewOverride ?? view
     return (
       <div className="app app-session" data-theme={dark ? 'dark' : 'light'}>
         <header className="header">
           <h1>Emdrizer</h1>
           <p className="tagline">Session</p>
         </header>
-        <section className="target-area session-area" aria-label="Session">
+        <section ref={sessionContainerRef} className="target-area session-area" aria-label="Session">
           <SessionFlow
             state={sessionState}
             actions={sessionActions}
-            view={view}
+            view={sessionView}
             hz={hz}
             dark={dark}
             sillyHand={sillyHand}
+            sessionContainerRef={sessionContainerRef}
           />
         </section>
       </div>
@@ -67,7 +109,7 @@ function App() {
           <button
             type="button"
             className="session-start-btn"
-            onClick={() => sessionActions.startSession()}
+            onClick={handleStartSession}
             aria-label="Start a structured session with stages and breaks"
           >
             Start session

@@ -190,12 +190,28 @@
   align-items: center;
   justify-content: center;
   padding: 1rem;
+  min-height: 80vh;
+}
+
+.app-session .session-area:fullscreen {
+  min-height: 100vh;
+  padding: 0.5rem;
 }
 
 .session-stage {
   max-width: 520px;
   width: 100%;
   text-align: center;
+}
+
+.session-stage.session-bls {
+  max-width: none;
+  width: 100%;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
 }
 
 .session-stage h2 {
@@ -267,9 +283,30 @@
 
 .session-target-container {
   width: 100%;
-  max-width: 900px;
+  flex: 1;
+  min-height: 50vh;
   margin: 0 auto 1rem;
-  min-height: 180px;
+  display: flex;
+  align-items: stretch;
+  justify-content: center;
+}
+
+.app-session .session-area:fullscreen .session-target-container {
+  min-height: 0;
+  flex: 1;
+}
+
+.session-bls-actions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 0.5rem;
+  justify-content: center;
+  margin-top: 0.5rem;
+}
+
+.session-bls-actions .session-btn {
+  margin: 0;
+  max-width: none;
 }
 
 .session-break .session-btn-primary {

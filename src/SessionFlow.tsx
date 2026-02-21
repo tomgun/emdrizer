@@ -13,9 +13,18 @@ interface SessionFlowProps {
   hz: number
   dark: boolean
   sillyHand: boolean
+  sessionContainerRef: React.RefObject<HTMLDivElement | null>
 }
 
-export function SessionFlow({ state, actions, view, hz, dark, sillyHand }: SessionFlowProps) {
+export function SessionFlow({
+  state,
+  actions,
+  view,
+  hz,
+  dark,
+  sillyHand,
+  sessionContainerRef,
+}: SessionFlowProps) {
   const timerRef = useRef<ReturnType<typeof setTimeout> | null>(null)
 
   // BLS stage: auto-advance to break after setDurationSeconds
@@ -27,6 +36,20 @@ export function SessionFlow({ state, actions, view, hz, dark, sillyHand }: Sessi
       if (timerRef.current) clearTimeout(timerRef.current)
     }
   }, [state.stage, state.currentSetIndex, state.config.setDurationSeconds, actions])
+
+  // Enter fullscreen when BLS starts (bigger eye movement range)
+  useEffect(() => {
+    if (state.stage === 'bls' && sessionContainerRef.current && !document.fullscreenElement) {
+      sessionContainerRef.current.requestFullscreen().catch(() => {})
+    }
+  }, [state.stage, state.currentSetIndex, sessionContainerRef])
+
+  // Exit fullscreen when moving to break
+  useEffect(() => {
+    if (state.stage === 'break' && document.fullscreenElement) {
+      document.exitFullscreen()
+    }
+  }, [state.stage])
 
   if (state.stage === 'preparation') {
     const primaryTarget = state.targets[0]
@@ -66,15 +89,25 @@ export function SessionFlow({ state, actions, view, hz, dark, sillyHand }: Sessi
           {setLabel}
         </p>
         <div className="session-target-container">
-          {view === 'sweeping-dot' && <KittTarget hz={hz} dark={dark} fullscreen={false} />}
-          {view === 'kitt' && <KittCarTarget hz={hz} dark={dark} fullscreen={false} />}
+          {view === 'sweeping-dot' && <KittTarget hz={hz} dark={dark} fullscreen />}
+          {view === 'kitt' && <KittCarTarget hz={hz} dark={dark} fullscreen />}
           {view === 'finger' && (
-            <TherapistFingerTarget hz={hz} dark={dark} sillyHand={sillyHand} fullscreen={false} />
+            <TherapistFingerTarget hz={hz} dark={dark} sillyHand={sillyHand} fullscreen />
           )}
         </div>
-        <button type="button" className="session-btn session-btn-secondary" onClick={actions.exitEarly}>
-          End session early
-        </button>
+        <div className="session-bls-actions">
+          <button
+            type="button"
+            className="session-btn session-btn-secondary"
+            onClick={() => document.exitFullscreen()}
+            aria-label="Exit full screen"
+          >
+            Exit full screen
+          </button>
+          <button type="button" className="session-btn session-btn-secondary" onClick={actions.exitEarly}>
+            End session early
+          </button>
+        </div>
       </div>
     )
   }

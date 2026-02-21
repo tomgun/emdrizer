@@ -3,7 +3,11 @@ import type { SessionState, SessionConfig, SessionTarget } from './sessionTypes'
 import { DEFAULT_SESSION_CONFIG } from './sessionTypes'
 
 export interface SessionActions {
-  startSession: (config?: Partial<SessionConfig>, targets?: SessionTarget[]) => void
+  startSession: (
+    config?: Partial<SessionConfig>,
+    targets?: SessionTarget[],
+    viewOverride?: SessionState['viewOverride']
+  ) => void
   leavePreparation: () => void
   toBreak: () => void
   toClosure: () => void
@@ -16,7 +20,11 @@ export function useSessionState(): [SessionState | null, SessionActions] {
   const [state, setState] = useState<SessionState | null>(null)
 
   const startSession = useCallback(
-    (config?: Partial<SessionConfig>, targets: SessionTarget[] = []) => {
+    (
+      config?: Partial<SessionConfig>,
+      targets: SessionTarget[] = [],
+      viewOverride?: SessionState['viewOverride']
+    ) => {
       const merged: SessionConfig = { ...DEFAULT_SESSION_CONFIG, ...config }
       setState({
         stage: 'preparation',
@@ -24,6 +32,7 @@ export function useSessionState(): [SessionState | null, SessionActions] {
         config: merged,
         targets,
         stageStartedAt: Date.now(),
+        viewOverride,
       })
     },
     []
