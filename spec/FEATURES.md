@@ -13,6 +13,14 @@
 
 ## Features
 
+### F-0005: Therapy session with stages, breaks, and targets
+- Parent: none
+- Dependencies: F-0001, F-0002, F-0003, F-0004 (session uses existing targets and presets)
+- Status: planned
+- Acceptance: spec/acceptance/F-0005.md
+- Domain: frontend, session flow
+- Notes: Session = Preparation → (BLS + Break)* → Closure. Targets = optional label/image/memory to concentrate on. See spec/session-structure.md.
+
 ### F-0004: Screen-size–dependent instructions
 - Parent: none
 - Dependencies: none
