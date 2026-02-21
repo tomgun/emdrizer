@@ -11,10 +11,10 @@ describe('TherapistFingerTarget', () => {
     expect(finger).toBeDefined()
   })
 
-  it('applies blur so finger is not sharp', () => {
+  it('has blurred background (hand is sharp for clarity per F-0002)', () => {
     render(<TherapistFingerTarget hz={1} />)
-    const finger = document.querySelector('.therapist-finger') as HTMLElement
-    expect(finger?.style.filter).toContain('blur')
+    const container = document.querySelector('[aria-hidden="true"]')
+    expect(container?.innerHTML).toContain('blur(')
   })
 
   it('renders with dark and light theme', () => {
